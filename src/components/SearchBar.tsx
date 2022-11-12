@@ -18,8 +18,8 @@ const Field = styled.View`
 const Icon = styled.Image`
     width: 30px;
     height: 30px;
-    margin: 0px 5px 0px 5px;;
-`
+    margin: 0px 5px 0px 5px;
+`;
 
 const SearchBar: React.FC<{ onSearch: () => void }> = ({ onSearch }) => {
   return (
