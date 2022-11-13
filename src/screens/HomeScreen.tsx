@@ -1,19 +1,13 @@
-import { useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import React, { useEffect, useState } from 'react';
-import { FlatList, View } from 'react-native';
 
 import styled from 'styled-components';
 import PokeCard from '../components/PokeCard';
 import SearchBar from '../components/SearchBar';
-import { POKEMON_QUERY } from '../graphql/queries';
-import { Pokemon, PokemonData, PokemonDataArray } from '../types/Pokemon';
+import { POKEMON_NAME_QUERY, POKEMON_QUERY } from '../graphql/queries';
+import { PartialPokemon, PartialPokemonData } from '../types/Pokemon';
+import { VerticalMargin } from '../util/util';
 
-const VerticalPad = styled.View`
-  margin: ${(props: { padding: number }) => props.padding}px 
-          0px
-          ${(props: { padding: number }) => props.padding}px
-          0px;
-`;
 
 const Title = styled.Text`
   font-size: 25px;
@@ -25,13 +19,24 @@ const Title = styled.Text`
 `;
 
 const Container = styled.View`
+  flex: 1;
   justify-content: flex-start;
   align-items: center;
+  background-color: white;
+`;
+
+const PokemonList = styled.FlatList`
+  flex-grow: 1;
+  margin-top: 10px;
+  width: 90%;
+  padding-top: 10px;
 `;
 
 const HomeScreen = () => {
-  const [pokemon, setPokemon] = useState<Pokemon[]>([]);
-  const { data } = useQuery<PokemonDataArray>(POKEMON_QUERY);
+  const [pokemon, setPokemon] = useState<PartialPokemon[]>([]);
+  const [search, setSearch] = useState<string>('');
+  const { data } = useQuery<PartialPokemonData>(POKEMON_QUERY);
+  const [queryPokemonByName, { data: searchData }] = useLazyQuery<PartialPokemonData>(POKEMON_NAME_QUERY);
 
   useEffect(() => {
     if(data?.pokemon) {
@@ -39,25 +44,30 @@ const HomeScreen = () => {
     }
   }, [data]);
 
-  const onSearch = () => {
-    //search again
+  useEffect(() => {
+    queryPokemonByName({ variables: { name: search.toLowerCase() } });
+    if(searchData?.pokemon) {
+      setPokemon(searchData.pokemon);
+    }
+  }, [search, searchData]);
+
+  const onSearch = (text: string) => {
+    setSearch(text);
   };
 
   return (
     <Container>
-      <VerticalPad padding={10}>
+      <VerticalMargin padding={10}>
         <Title>More than 250 Pokemons for you to choose your favorite</Title>
-      </VerticalPad>
-      <SearchBar onSearch={onSearch}/>
-      <FlatList
+      </VerticalMargin>
+      <SearchBar onSearch={(text) => onSearch(text)}/>
+      <PokemonList
         data={pokemon}
         renderItem={({ item }) => (
           <PokeCard {...item} id={item.id}/>
         )}
         numColumns={2}
-        style={{ marginHorizontal: 30 }}
-        contentContainerStyle={{ backgroundColor: 'red', justifyContent: 'space-between' }}
-        // ItemSeparatorComponent={() => (<View style={{margin: 10}}/>)}
+        contentContainerStyle={{ paddingBottom: 40 }}
       />
     </Container>
   );

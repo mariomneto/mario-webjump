@@ -1,9 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import styled from 'styled-components';
-import { Pokemon } from '../types/Pokemon';
+import { PartialPokemon, Pokemon } from '../types/Pokemon';
+import { useNavigation } from '@react-navigation/native';
+import { getPokemonSprite, treatId, treatText } from '../util/util';
 
-const Card = styled.View`
+const Card = styled.TouchableOpacity`
+    flex-grow: 1;
     justify-content: space-around;
     align-items: center;
     margin: 10px 10px 10px 10px;
@@ -26,10 +29,17 @@ const IdTag = styled.View`
 
 const PokemonView = styled.View`
     background-color: #71E5C9;
+    justify-content: center;
+    align-items: center;
     width: 100px;
     height: 100px;
     border-radius: 150px;
     margin-top: 10px;
+`;
+
+const PokemonSprite = styled.Image`
+    width: 80%;
+    height: 80%;
 `;
 
 const Title = styled.Text`
@@ -49,19 +59,27 @@ const TypeTag = styled.View`
     height: 24px;
 `;
 
-const PokeCard: React.FC<Pokemon> = ({ name, id, types }) => {
+const PokeCard: React.FC<PartialPokemon> = ({ name, id, types, sprites }) => {
+    const navigation = useNavigation();
     return (
-        <Card>
+        <Card
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate("Stats", { id })}
+        >
             <IdTag>
-                <Text>#{id}</Text>
+                <Text>#{treatId(id)}</Text>
             </IdTag>
-           <PokemonView/>
+            <PokemonView>
+                {sprites &&
+                    <PokemonSprite source={{uri: getPokemonSprite(sprites)}}/>
+                }
+            </PokemonView>
            <View style={{ alignItems: 'center' }}>
-                <Title>{name}</Title>
+                <Title>{treatText(name)}</Title>
                 <View style={{ flexDirection: 'row' }}>
                     {types.map(t => (
-                        <TypeTag>
-                            <Text style={{ color: 'white' }}>{t.type.name}</Text>
+                        <TypeTag key={t.type.name}>
+                            <Text style={{ color: 'white' }}>{treatText(t.type.name)}</Text>
                         </TypeTag>
                     ))}
                 </View>

@@ -21,7 +21,7 @@ const Icon = styled.Image`
     margin: 0px 5px 0px 5px;
 `;
 
-const SearchBar: React.FC<{ onSearch: () => void }> = ({ onSearch }) => {
+const SearchBar: React.FC<{ onSearch: (text: string) => void }> = ({ onSearch }) => {
   return (
     <Field>
         <Icon source={require("../res/lupa.png")}/>

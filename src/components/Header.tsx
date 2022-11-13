@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Pressable, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import styled from 'styled-components/native';
@@ -30,11 +31,12 @@ const Logo = styled.Image`
 `;
 
 const Header: React.FC<{ backButton?: boolean }> = ({ backButton }) => {
+  const navigation = useNavigation();
   return (
     <Body>
       {
         backButton &&
-        <TouchableOpacity activeOpacity={0.6}>
+        <TouchableOpacity activeOpacity={0.6} onPress={navigation.goBack}>
           <Arrow source={require('../res/back.png')} />
         </TouchableOpacity>
       }
